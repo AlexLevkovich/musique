@@ -30,8 +30,10 @@ public:
     static const char *NAME;
     static const char *UNIX_NAME;
     static const char *ORG_NAME;
+    static const char *ORG_NAME2;
     static const char *ORG_DOMAIN;
     static const char *WEBSITE;
+    static const char *WEBSITE2;
     static const char *EMAIL;
     static const char *LASTFM_API_KEY;
     static const char *LASTFM_SHARED_SECRET;

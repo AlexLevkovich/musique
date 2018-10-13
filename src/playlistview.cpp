@@ -28,6 +28,10 @@ $END_LICENSE */
 #include "mainwindow.h"
 #include "datautils.h"
 
+#ifndef __PRETTY_FUNCTION__
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 PlaylistView::PlaylistView(QWidget *parent) :
         QListView(parent),
         playlistModel(0), overlayLabel(0) {

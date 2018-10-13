@@ -20,6 +20,7 @@ $END_LICENSE */
 
 #include "coverutils.h"
 #include "model/album.h"
+#include <attachedpictureframe.h>
 
 bool CoverUtils::isAcceptableImage(const QImage &image) {
     static const int minimumSize = 150;
@@ -138,7 +139,8 @@ bool CoverUtils::coverFromXiphComment(TagLib::Ogg::XiphComment *xiphComment, Alb
 
     if (!xiphComment) return false;
 
-    const TagLib::StringList &stringList = xiphComment->fieldListMap()["COVERART"];
+    TagLib::Ogg::FieldListMap lstOgg = xiphComment->fieldListMap();
+    const TagLib::StringList & stringList = lstOgg["COVERART"];
     if (stringList.isEmpty()) return false;
     TagLib::ByteVector byteVector = stringList.front().data(TagLib::String::Latin1);
 
@@ -154,6 +156,7 @@ bool CoverUtils::coverFromXiphComment(TagLib::Ogg::XiphComment *xiphComment, Alb
     qDebug() << "Cover from Xiph!";
 
     return saveImage(image, album);
+    return true;
 }
 
 bool CoverUtils::coverFromMP4(QString filename, Album *album) {

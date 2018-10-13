@@ -14,10 +14,10 @@ To be able to build on a Debian (or derivative) system:
 
 Compiling:
 
-    $ qmake
+    $ qmake {PHONON=ON or LIBMPV=ON} [NO_ADV=ON] CONFIG-=debug CONFIG+=release
     $ make
 
-Beware of the Qt 4 version of qmake!
+Beware of the Qt 5 version of qmake!
 
 Running:
 
@@ -32,6 +32,10 @@ This is for packagers. End users should not install applications in this way.
 ## A word about Phonon on Linux
 To be able to actually listen to music you need a working Phonon setup.
 Please don't contact me about this, ask for help on your distribution support channels.
+
+## This version can use libMPV instead of Phonon: set LIBMPV=ON.
+## NO_ADV=ON is used to disable all advertisement was set by original author.
+## It can be compiled on Windows but it is not easy. I'm going to present ready x64 releases soon.
 
 ## Legal Stuff
 Copyright (C) 2010 Flavio Tordini

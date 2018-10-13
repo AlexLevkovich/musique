@@ -102,14 +102,24 @@ MediaView::MediaView(QWidget *parent) : View(parent) {
 void MediaView::setMediaObject(Phonon::MediaObject *mediaObject) {
     this->mediaObject = mediaObject;
 #ifdef APP_MAC
+#ifdef PHONON
     mediaObject->setTransitionTime(-300);
 #endif
+#endif
     connect(mediaObject, SIGNAL(finished()), SLOT(playbackFinished()));
+#ifdef USE_PHONON
     connect(mediaObject, SIGNAL(stateChanged(Phonon::State, Phonon::State)),
             SLOT(stateChanged(Phonon::State, Phonon::State)));
-    connect(mediaObject, SIGNAL(aboutToFinish()), SLOT(aboutToFinish()));
     connect(mediaObject, SIGNAL(currentSourceChanged(Phonon::MediaSource)),
         SLOT(currentSourceChanged(Phonon::MediaSource)));
+#endif
+#ifdef USE_LIBMPV
+    connect(mediaObject, SIGNAL(stateChanged(Libmpv::State, Libmpv::State)),
+            SLOT(stateChanged(Libmpv::State, Libmpv::State)));
+    connect(mediaObject, SIGNAL(currentSourceChanged(Libmpv::MediaSource)),
+        SLOT(currentSourceChanged(Libmpv::MediaSource)));
+#endif
+    connect(mediaObject, SIGNAL(aboutToFinish()), SLOT(aboutToFinish()));
 }
 
 void MediaView::saveSplitterState() {
@@ -141,10 +151,6 @@ void MediaView::stateChanged(Phonon::State newState, Phonon::State /*oldState*/)
         //qDebug("paused");
         break;
 
-    case Phonon::BufferingState:
-        //qDebug("buffering");
-        break;
-
     case Phonon::LoadingState:
         //qDebug("loading");
         break;
@@ -153,7 +159,6 @@ void MediaView::stateChanged(Phonon::State newState, Phonon::State /*oldState*/)
 }
 
 void MediaView::activeRowChanged(int row, bool manual, bool startPlayback) {
-
     errorTimer->stop();
 
     Track *track = playlistModel->trackAt(row);
@@ -303,7 +308,6 @@ void MediaView::aboutToFinish() {
             mediaObject->enqueue(QUrl::fromLocalFile(absolutePath));
         }
     }
-    trackFinished();
 }
 
 void MediaView::currentSourceChanged(Phonon::MediaSource mediaSource) {

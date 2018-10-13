@@ -61,23 +61,26 @@ AboutView::AboutView(QWidget *parent) : View(parent) {
 
     info += "<p>" + tr("Version %1").arg(Constants::VERSION) + "</p>";
 
-    info += QString("<p><a href='%1/'>%1</a></p>").arg(Constants::WEBSITE);
+    info += QString("<p>Original: <a href='%1/'>%1</a></p>").arg(Constants::WEBSITE);
+    info += QString("<p>Current: <a href='%1/'>%1</a></p>").arg(Constants::WEBSITE2);
 
 #ifdef APP_ACTIVATION
     if (Activation::instance().isActivated()) {
         info += "<p>" + tr("Licensed to: %1").arg("<b>" + Activation::instance().getEmail() + "</b>") + "</p>";
     }
 #endif
-
+#ifndef NO_ADV
     info += "<p>" + tr("Translate %1 to your native language using %2").arg(Constants::NAME)
             .arg("<a href='http://www.transifex.net/projects/p/" + QLatin1String(Constants::UNIX_NAME) + "/'>Transifex</a>") + "</p>";
+#endif
 
 #ifndef APP_EXTRA
     "<p>" + tr("Released under the <a href='%1'>GNU General Public License</a>")
     .arg("http://www.gnu.org/licenses/gpl.html") + "</p>";
 #endif
 
-    info += "<p>&copy; 2016 " + QLatin1String(Constants::ORG_NAME) + "</p></body></html>";
+    info += "<p>&copy; 2016 <b>" + QLatin1String(Constants::ORG_NAME) + "</b></p></body></html>";
+    info += "<p>&copy; 2018 <b>" + QLatin1String(Constants::ORG_NAME2) + "</b></p></body></html>";
 
     QLabel *infoLabel = new QLabel(info, this);
     infoLabel->setOpenExternalLinks(true);
@@ -96,7 +99,9 @@ AboutView::AboutView(QWidget *parent) : View(parent) {
 
     layout->addLayout(buttonLayout);
 
+#ifndef NO_ADV
     verticalLayout->addWidget(new AppsWidget());
+#endif
 }
 
 void AboutView::paintEvent(QPaintEvent *e) {

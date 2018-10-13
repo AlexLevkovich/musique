@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
     }
     // qDebug() << "Using locale dir" << localeDir << locale;
     QTranslator translator;
-    translator.load(QLocale::system(), QString(), QString(), localeDir);
+    translator.load(QLocale::system().name().split("_").at(0),localeDir);
     app.installTranslator(&translator);
 
     MainWindow* mainWin = MainWindow::instance();

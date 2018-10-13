@@ -228,6 +228,10 @@ Qt::ItemFlags SearchModel::flags(const QModelIndex &index) const {
         return defaultFlags;
 }
 
+int SearchModel::columnCount(const QModelIndex &) const {
+    return 1;
+}
+
 QStringList SearchModel::mimeTypes() const {
     QStringList types;
     types << TRACK_MIME;

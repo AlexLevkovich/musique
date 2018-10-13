@@ -380,7 +380,7 @@ void Track::getLyrics() {
             qDebug() << "Cannot open file" << file.fileName();
         } else {
             QByteArray bytes = file.readAll();
-            emit gotLyrics(QString::fromUtf8(bytes.data()));
+            emit gotLyrics(QString::fromLocal8Bit(bytes.data()));
             return;
         }
     }

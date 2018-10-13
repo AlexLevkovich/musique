@@ -22,10 +22,21 @@ $END_LICENSE */
 #define MAINWINDOW_H
 
 #include <QtWidgets>
+#ifdef USE_PHONON
 #include <phonon/audiooutput.h>
 #include <phonon/volumeslider.h>
 #include <phonon/mediaobject.h>
 #include <phonon/seekslider.h>
+#endif
+
+#ifdef USE_LIBMPV
+#include "mpvaudiooutput.h"
+#include "mpvvolumeslider.h"
+#include "mpvmediaobject.h"
+#include "mpvseekslider.h"
+#define Phonon Libmpv
+#endif
+
 
 class MediaView;
 class CollectionScannerView;
@@ -87,8 +98,6 @@ protected:
 private slots:
     void lazyInit();
     void visitSite();
-    void donate();
-    void reportIssue();
     void about();
     void toggleFullscreen();
     void updateUIForFullscreen();
@@ -175,7 +184,6 @@ private:
     QAction *backAct;
     QAction *quitAct;
     QAction *siteAct;
-    QAction *donateAct;
     QAction *aboutAct;
     QAction *searchFocusAct;
     QAction *chooseFolderAct;

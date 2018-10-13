@@ -478,7 +478,7 @@
     </message>
     <message>
         <source>%1 on the Web</source>
-        <translation>&amp;1 у Сеціве</translation>
+        <translation>&amp;%1 у Сеціве</translation>
     </message>
     <message>
         <source>Make a &amp;donation</source>
@@ -650,7 +650,7 @@
     </message>
     <message>
         <source>%1 finished scanning your music collection</source>
-        <translation type="unfinished"/>
+        <translation type="%1 скончыў сканаваць вашу музычную калекцію"/>
     </message>
     <message>
         <source>&amp;Love %1? Rate it!</source>

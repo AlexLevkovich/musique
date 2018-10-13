@@ -298,11 +298,6 @@ void MainWindow::createActions() {
     actionMap.insert("site", siteAct);
     connect(siteAct, SIGNAL(triggered()), SLOT(visitSite()));
 
-    donateAct = new QAction(tr("Make a &donation"), this);
-    donateAct->setStatusTip(tr("Please support the continued development of %1").arg(Constants::NAME));
-    actionMap.insert("donate", donateAct);
-    connect(donateAct, SIGNAL(triggered()), SLOT(donate()));
-
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setMenuRole(QAction::AboutRole);
     aboutAct->setStatusTip(tr("Info about %1").arg(Constants::NAME));
@@ -317,10 +312,6 @@ void MainWindow::createActions() {
     action->setVisible(false);
     actionMap.insert("finetune", action);
     connect(action, SIGNAL(triggered()), SLOT(runFinetune()));
-
-    action = new QAction(tr("&Report an Issue..."), this);
-    actionMap.insert("report-issue", action);
-    connect(action, SIGNAL(triggered()), SLOT(reportIssue()));
 
     action = new QAction(IconUtils::icon("edit-clear"), tr("&Clear"), this);
     action->setShortcut(QKeySequence::New);
@@ -500,8 +491,6 @@ void MainWindow::createMenus() {
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(siteAct);
-    helpMenu->addAction(donateAct);
-    helpMenu->addAction(actionMap.value("report-issue"));
     helpMenu->addAction(aboutAct);
 
 #ifdef APP_MAC_STORE
@@ -566,7 +555,9 @@ void MainWindow::createToolBars() {
 
     mainToolBar->addWidget(new Spacer());
 
+#ifdef USE_PHONON
     seekSlider->setIconVisible(false);
+#endif
     seekSlider->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
     mainToolBar->addWidget(seekSlider);
 
@@ -678,7 +669,6 @@ void MainWindow::showWidget(QWidget* widget, bool transition) {
     chooseFolderAct->setEnabled(widget == mediaView || widget == contextualView);
     toolbarSearch->setEnabled(widget == mediaView || widget == contextualView);
 
-    QWidget *oldWidget = views->currentWidget();
     views->setCurrentWidget(widget);
 
     setUpdatesEnabled(true);
@@ -708,12 +698,6 @@ void MainWindow::about() {
 
 void MainWindow::visitSite() {
     QUrl url(Constants::WEBSITE);
-    statusBar()->showMessage(QString(tr("Opening %1").arg(url.toString())));
-    QDesktopServices::openUrl(url);
-}
-
-void MainWindow::donate() {
-    QUrl url(QString(Constants::WEBSITE) + "#donate");
     statusBar()->showMessage(QString(tr("Opening %1").arg(url.toString())));
     QDesktopServices::openUrl(url);
 }
@@ -918,7 +902,9 @@ void MainWindow::stateChanged(Phonon::State newState, Phonon::State /* oldState 
         // stopAct->setEnabled(true);
         break;
 
+#ifdef USE_PHONON
     case Phonon::BufferingState:
+#endif
     case Phonon::LoadingState:
         // stopAct->setEnabled(true);
         currentTime->clear();
@@ -1032,17 +1018,36 @@ void MainWindow::searchFocus() {
 }
 
 void MainWindow::initPhonon() {
-    mediaObject = new Phonon::MediaObject(this);
+    mediaObject = new Phonon::MediaObject(
+#ifdef USE_LIBMPV
+                Constants::NAME,
+#endif
+                this);
     mediaObject->setTickInterval(100);
+#ifdef USE_PHONON
     connect(mediaObject, SIGNAL(stateChanged(Phonon::State, Phonon::State)),
             this, SLOT(stateChanged(Phonon::State, Phonon::State)));
+#endif
+#ifdef USE_LIBMPV
+    connect(mediaObject, SIGNAL(stateChanged(Libmpv::State, Libmpv::State)),
+            this, SLOT(stateChanged(Libmpv::State, Libmpv::State)));
+#endif
     connect(mediaObject, SIGNAL(tick(qint64)), this, SLOT(tick(qint64)));
     connect(mediaObject, SIGNAL(totalTimeChanged(qint64)), this, SLOT(totalTimeChanged(qint64)));
 
-    audioOutput = new Phonon::AudioOutput(Phonon::MusicCategory, this);
+    audioOutput = new Phonon::AudioOutput(
+#ifdef USE_PHONON
+                Phonon::MusicCategory
+#endif
+#ifdef USE_LIBMPV
+                mediaObject
+#endif
+                ,this);
     connect(audioOutput, SIGNAL(volumeChanged(qreal)), this, SLOT(volumeChanged(qreal)));
     connect(audioOutput, SIGNAL(mutedChanged(bool)), this, SLOT(volumeMutedChanged(bool)));
+#ifdef USE_PHONON
     Phonon::createPath(mediaObject, audioOutput);
+#endif
 
     seekSlider->setMediaObject(mediaObject);
     volumeSlider->setAudioOutput(audioOutput);
@@ -1235,18 +1240,22 @@ void MainWindow::showFinetuneDialog(const QVariantMap &stats) {
                  QString::number(tracksNeedingFixCount),
                  QString::number(percent));
 
-    QString infoText = tr("Do you want to fix them now with %1?").arg("Finetune");
-
     QMessageBox msgBox(this);
+#ifndef NO_ADV
     msgBox.setIconPixmap(IconUtils::pixmap(":/images/64x64/finetune.png"));
+    msgBox.setInformativeText(tr("Do you want to fix them now with %1?").arg("Finetune"));
+#endif
     msgBox.setText(message);
-    msgBox.setInformativeText(infoText);
     msgBox.setModal(true);
     msgBox.setWindowModality(Qt::WindowModal);
     msgBox.addButton(QMessageBox::Close);
+#ifndef NO_ADV
     QPushButton* acceptButton = msgBox.addButton(tr("Fix my music"), QMessageBox::AcceptRole);
+#endif
     msgBox.exec();
+#ifndef NO_ADV
     if (msgBox.clickedButton() == acceptButton) runFinetune(stats);
+#endif
 }
 
 void MainWindow::runFinetune() {
@@ -1529,7 +1538,3 @@ void MainWindow::showDemoDialog(QString message) {
 }
 #endif
 
-void MainWindow::reportIssue() {
-    QUrl url("http://flavio.tordini.org/forums/forum/musique-forums/musique-troubleshooting");
-    QDesktopServices::openUrl(url);
-}

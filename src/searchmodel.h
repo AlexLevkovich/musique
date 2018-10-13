@@ -47,7 +47,7 @@ public slots:
 protected:
     int rowCount(const QModelIndex & /* parent */) const;
     QVariant data(const QModelIndex &item, int role) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const { return 1; }
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
 private slots:
     void updatePlayIcon();

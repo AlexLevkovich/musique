@@ -96,20 +96,12 @@ void AlbumInfo::setAlbum(Album *album) {
     titleLabel->setText(album->getTitle());
 
     QString wiki = album->getWiki();
+    wiki.replace("\r\n","<br>");
+    wiki.replace("\n","<br>");
     if (wiki.isEmpty()) {
         wikiLabel->clear();
     } else {
-        int split = wiki.indexOf('\n', 512);
-        if (split == -1) {
-            split = wiki.indexOf(". ", 512);
-        }
-
-        QString html = "<html><style>a { color: white }</style><body>" + wiki.left(split);
-        if (split != -1) {
-            Artist *artist = album->getArtist();
-            QString url = "http://www.last.fm/music/" + (artist ? artist->getName() : "_") + "/" + album->getTitle() + "/+wiki";
-            html += QString(" <a href='%1'>%2</a>").arg(url, tr("Read more"));
-        }
+        QString html = "<html><style>a { color: white }</style><body>" + wiki;
         html += "</body></html>";
         wikiLabel->setText(html);
     }

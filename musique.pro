@@ -1,7 +1,8 @@
-CONFIG += release c++11 exceptions_off rtti_off
-QMAKE_CXXFLAGS *= -fno-exceptions -fno-rtti
+CONFIG += c++11 exceptions_off rtti_off
+unix: QMAKE_CXXFLAGS *= -fno-exceptions -fno-rtti
+win32: QMAKE_CXXFLAGS *= /EHsc- -GR-
 TEMPLATE = app
-VERSION = 1.5
+VERSION = 1.6
 DEFINES += APP_VERSION="$$VERSION"
 
 APP_NAME = Musique
@@ -14,9 +15,54 @@ DEFINES *= QT_NO_DEBUG_OUTPUT
 DEFINES *= QT_USE_QSTRINGBUILDER
 DEFINES *= QT_STRICT_ITERATORS
 
+win32: {
+    DEFINES += WIN32_LEAN_AND_MEAN
+    #QMAKE_LFLAGS_WINDOWS += /FORCE:MULTIPLE
+    RC_ICONS += images/app.ico
+}
+
 TARGET = $${APP_UNIX_NAME}
 
 QT += network sql widgets
+
+CONFIG += link_pkgconfig
+PKGCONFIG += taglib
+
+equals(NO_ADV, "ON") {
+    DEFINES += NO_ADV
+}
+
+equals(LIBMPV, "ON") : !equals(PHONON, "ON") {
+    HEADERS += \
+    src/mpvaudiooutput.h \
+    src/mpvmediaobject.h \
+    src/mpvmediasource.h \
+    src/mpvseekslider.h \
+    src/mpvvolumeslider.h \
+    src/libmpv_def.h
+    SOURCES += \
+    src/mpvaudiooutput.cpp \
+    src/mpvmediaobject.cpp \
+    src/mpvmediasource.cpp \
+    src/mpvseekslider.cpp \
+    src/mpvvolumeslider.cpp
+    PKGCONFIG += mpv
+    DEFINES += USE_LIBMPV
+}
+
+equals(PHONON, "ON") : !equals(LIBMPV, "ON") {
+    PKGCONFIG += phonon4qt5
+    DEFINES += USE_PHONON
+}
+
+equals(PHONON, "ON") : equals(LIBMPV, "ON") {
+    error("One of PHONON=ON or LIBMPV=ON must be defined!")
+}
+
+!equals(PHONON, "ON") : !equals(LIBMPV, "ON") {
+    error("One of PHONON=ON or LIBMPV=ON must be defined!")
+}
+
 
 include(src/qtsingleapplication/qtsingleapplication.pri)
 include(src/http/http.pri)
@@ -162,27 +208,23 @@ include(locale/locale.pri)
 # deploy
 DISTFILES += CHANGES LICENSE
 unix:!mac {
-    qt:greaterThan(QT_MAJOR_VERSION, 4) {
-        LIBS += -lphonon4qt5
-        INCLUDEPATH += /usr/include/phonon4qt5
-    } else {
-        QT += phonon
-        INCLUDEPATH += /usr/include/phonon
-    }
-    LIBS += -ltag
-    INCLUDEPATH += /usr/include/taglib
     QT += dbus
     HEADERS += src/gnomeglobalshortcutbackend.h
     SOURCES += src/gnomeglobalshortcutbackend.cpp
     isEmpty(PREFIX):PREFIX = /usr/local
-    BINDIR = $$PREFIX/bin
-    INSTALLS += target
-    target.path = $$BINDIR
-    DATADIR = $$PREFIX/share
-    PKGDATADIR = $$DATADIR/$${APP_UNIX_NAME}
-    DEFINES += DATADIR=\\\"$$DATADIR\\\" \
-        PKGDATADIR=\\\"$$PKGDATADIR\\\"
-    INSTALLS += translations \
+}
+
+win32: isEmpty(PREFIX):PREFIX = .
+
+BINDIR = $$PREFIX/bin
+INSTALLS += target
+target.path = $$BINDIR
+win32: DATADIR = $$BINDIR/share
+unix: DATADIR = $$PREFIX/share
+PKGDATADIR = $$DATADIR/$${APP_UNIX_NAME}
+DEFINES += DATADIR=\\\"$$DATADIR\\\" \
+           PKGDATADIR=\\\"$$PKGDATADIR\\\"
+INSTALLS += translations \
         desktop \
         iconsvg \
         icon16 \
@@ -193,27 +235,25 @@ unix:!mac {
         icon128 \
         icon256 \
         icon512
-    translations.path = $$PKGDATADIR
-    translations.files += $$DESTDIR/locale
-    desktop.path = $$DATADIR/applications
-    desktop.files += $${APP_UNIX_NAME}.desktop
-    iconsvg.path = $$DATADIR/icons/hicolor/scalable/apps
-    iconsvg.files += data/$${APP_UNIX_NAME}.svg
-    icon16.path = $$DATADIR/icons/hicolor/16x16/apps
-    icon16.files += data/16x16/$${APP_UNIX_NAME}.png
-    icon22.path = $$DATADIR/icons/hicolor/22x22/apps
-    icon22.files += data/22x22/$${APP_UNIX_NAME}.png
-    icon32.path = $$DATADIR/icons/hicolor/32x32/apps
-    icon32.files += data/32x32/$${APP_UNIX_NAME}.png
-    icon48.path = $$DATADIR/icons/hicolor/48x48/apps
-    icon48.files += data/48x48/$${APP_UNIX_NAME}.png
-    icon64.path = $$DATADIR/icons/hicolor/64x64/apps
-    icon64.files += data/64x64/$${APP_UNIX_NAME}.png
-    icon128.path = $$DATADIR/icons/hicolor/128x128/apps
-    icon128.files += data/128x128/$${APP_UNIX_NAME}.png
-    icon256.path = $$DATADIR/icons/hicolor/256x256/apps
-    icon256.files += data/256x256/$${APP_UNIX_NAME}.png
-    icon512.path = $$DATADIR/icons/hicolor/512x512/apps
-    icon512.files += data/512x512/$${APP_UNIX_NAME}.png
-}
-mac|win32|contains(DEFINES, APP_UBUNTU):include(local/local.pri)
+translations.path = $$PKGDATADIR
+translations.files += $$DESTDIR/locale
+desktop.path = $$DATADIR/applications
+desktop.files += $${APP_UNIX_NAME}.desktop
+iconsvg.path = $$DATADIR/icons/hicolor/scalable/apps
+iconsvg.files += data/$${APP_UNIX_NAME}.svg
+icon16.path = $$DATADIR/icons/hicolor/16x16/apps
+icon16.files += data/16x16/$${APP_UNIX_NAME}.png
+icon22.path = $$DATADIR/icons/hicolor/22x22/apps
+icon22.files += data/22x22/$${APP_UNIX_NAME}.png
+icon32.path = $$DATADIR/icons/hicolor/32x32/apps
+icon32.files += data/32x32/$${APP_UNIX_NAME}.png
+icon48.path = $$DATADIR/icons/hicolor/48x48/apps
+icon48.files += data/48x48/$${APP_UNIX_NAME}.png
+icon64.path = $$DATADIR/icons/hicolor/64x64/apps
+icon64.files += data/64x64/$${APP_UNIX_NAME}.png
+icon128.path = $$DATADIR/icons/hicolor/128x128/apps
+icon128.files += data/128x128/$${APP_UNIX_NAME}.png
+icon256.path = $$DATADIR/icons/hicolor/256x256/apps
+icon256.files += data/256x256/$${APP_UNIX_NAME}.png
+icon512.path = $$DATADIR/icons/hicolor/512x512/apps
+icon512.files += data/512x512/$${APP_UNIX_NAME}.png

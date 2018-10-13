@@ -22,7 +22,15 @@ $END_LICENSE */
 #define MEDIAVIEW_H
 
 #include <QtWidgets>
+#ifdef USE_PHONON
 #include <phonon/mediaobject.h>
+#endif
+
+#ifdef USE_LIBMPV
+#include "mpvmediaobject.h"
+#include "mpvmediasource.h"
+#define Phonon Libmpv
+#endif
 
 #include "view.h"
 #include "finderwidget.h"
@@ -57,8 +65,8 @@ private slots:
     void playlistFinished();
     void playbackFinished();
     void trackFinished();
-    void aboutToFinish();
     void currentSourceChanged(Phonon::MediaSource mediaSource);
+    void aboutToFinish();
 #ifdef APP_ACTIVATION
     void updateContinueButton(int);
 #endif

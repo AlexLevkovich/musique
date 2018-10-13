@@ -72,16 +72,9 @@ void ArtistInfo::setArtist(Artist *artist) {
     titleLabel->setText(artist->getName());
 
     QString bio = artist->getBio();
-    int split = bio.indexOf('\n', 512);
-    if (split == -1) {
-        split = bio.indexOf(". ", 512);
-    }
-
-    QString htmlBio = "<html><style>a { color: white }</style><body>" + bio.left(split);
-    if (split != -1) {
-        QString bioUrl = "http://www.last.fm/music/" + artist->getName() + "/+wiki";
-        htmlBio += QString(" <a href='%1'>%2</a>").arg(bioUrl, tr("Read more"));
-    }
+    bio.replace("\r\n","<br>");
+    bio.replace("\n","<br>");
+    QString htmlBio = "<html><style>a { color: white }</style><body>" + bio;
     htmlBio += "</body></html>";
     bioLabel->setText(htmlBio);
 

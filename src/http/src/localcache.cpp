@@ -1,5 +1,9 @@
 #include "localcache.h"
 
+#ifndef __PRETTY_FUNCTION__
+#define __PRETTY_FUNCTION__ __FUNCTION__
+#endif
+
 LocalCache *LocalCache::instance(const QString &name) {
     static QHash<QString, LocalCache*> instances;
     QHash<QString, LocalCache*>::const_iterator i = instances.constFind(name);

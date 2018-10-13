@@ -34,6 +34,7 @@ ContextualView::ContextualView(QWidget *parent) : View(parent) {
     scrollArea->setWidgetResizable(true);
     scrollingContextualView = new ScrollingContextualView(this);
     scrollArea->setWidget(scrollingContextualView);
+    scrollArea->viewport()->setStyleSheet(QString("background-color: %1").arg(scrollingContextualView->palette().color(QPalette::Window).name()));
     layout->addWidget(scrollArea);
 }
 
@@ -57,7 +58,7 @@ ScrollingContextualView::ScrollingContextualView(QWidget *parent) :
     // colors
     QPalette p = palette();
     p.setBrush(QPalette::Window, QColor(0x30, 0x30, 0x30));
-    p.setBrush(QPalette::Foreground, QColor(0xdc, 0xdc, 0xdc));
+    p.setBrush(QPalette::WindowText, QColor(0xdc, 0xdc, 0xdc));
     p.setBrush(QPalette::Base, Qt::red);
     p.setBrush(QPalette::Text, Qt::white);
     p.setColor(QPalette::Link, Qt::white);

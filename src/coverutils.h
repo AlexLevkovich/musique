@@ -26,7 +26,6 @@ $END_LICENSE */
 // TagLib
 #include <id3v2tag.h>
 #include <mpegfile.h>
-#include <attachedpictureframe.h>
 #include <oggfile.h>
 #include <vorbisfile.h>
 #include <flacfile.h>

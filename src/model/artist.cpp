@@ -470,5 +470,5 @@ QString Artist::getBio() {
         return QString();
     }
     QByteArray bytes = file.readAll();
-    return QString::fromUtf8(bytes.data());
+    return QString::fromLocal8Bit(bytes.data());
 }
