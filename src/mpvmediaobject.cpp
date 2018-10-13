@@ -111,16 +111,9 @@ State MediaObject::state() const {
 }
 
 void MediaObject::setCurrentSource(const MediaSource & source) {
-    int index = m_mediaSources.indexOf(source);
-    if (index < 0) {
-        clear();
-        m_currMediaIndex = 0;
-        _enqueue(source,true);
-    }
-    else {
-        stop();
-        m_currMediaIndex = index;
-    }
+    clear();
+    m_currMediaIndex = 0;
+    _enqueue(source,true);
 }
 
 void MediaObject::setQueue(const QList<MediaSource> & sources) {
