@@ -650,7 +650,7 @@
     </message>
     <message>
         <source>%1 finished scanning your music collection</source>
-        <translation type="%1 скончыў сканаваць вашу музычную калекцію"/>
+        <translation type="%1 скончыў сканаваць вашу музычную калекцыю"/>
     </message>
     <message>
         <source>&amp;Love %1? Rate it!</source>
