@@ -211,9 +211,14 @@ void MediaObject::play() {
         mpv_observe_property(m_mpv_core, 5, "volume",   MPV_FORMAT_NODE);
     }
 
-    if(m_mpv_core != NULL && (state() == PausedState || (source.isValid() && state() == StoppedState))) {
+    if(m_mpv_core != NULL && (state() == PausedState || (source.isValid() && (state() == StoppedState || state() == ErrorState)))) {
         int f = 0;
         mpv_set_property_async(m_mpv_core, 0, "pause", MPV_FORMAT_FLAG, &f);
+        if (state() == PausedState) {
+            State old_state = m_state;
+            m_state = PlayingState;
+            emit stateChanged(m_state,old_state);
+        }
     }
 }
 
