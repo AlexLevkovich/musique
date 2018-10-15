@@ -38,11 +38,7 @@ bool MediaSource::isValid() const {
 }
 
 QString MediaSource::fileName() const {
-    return m_url.toLocalFile()
-#ifdef _WIN32
-          .replace('/','\\')
-#endif
-    ;
+    return m_url.toLocalFile();
 }
 
 MediaSource::Type MediaSource::type() const {
