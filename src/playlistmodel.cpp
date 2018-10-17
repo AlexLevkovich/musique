@@ -121,6 +121,10 @@ void PlaylistModel::skipForward() {
         int nextRow = tracks.indexOf(nextTrack);
         setActiveRow(nextRow);
     } else {
+        if (activeRow != 1) {
+            QModelIndex newIndex = index(activeRow, 0, QModelIndex());
+            emit dataChanged(newIndex, newIndex);
+        }            
         activeRow = -1;
         activeTrack = 0;
         foreach(Track *track, playedTracks)
