@@ -356,8 +356,6 @@ bool MediaObject::event(QEvent* event) {
 void MediaObject::on_media_finished() {
     if (m_mediaSources.isEmpty()) m_doCompleteStop = true;
 
-    if (m_finishEmitted) emit finished();
-    else m_finishEmitted = true;
     State prev_state = m_state;
     m_state = (m_mediaSources.count() > 0)?StoppedState:LoadingState;
     emit stateChanged(m_state,prev_state);
@@ -366,6 +364,10 @@ void MediaObject::on_media_finished() {
     if ((m_currMediaIndex+1) < m_mediaSources.count() && !m_doCompleteStop) {
         m_currMediaIndex++;
         play();
+    }
+    else if (!m_doCompleteStop) {
+        if (m_finishEmitted) emit finished();
+        else m_finishEmitted = true;
     }
     m_doCompleteStop = false;
 }
